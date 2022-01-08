@@ -1,22 +1,37 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
 namespace BowlingBall
 {
     public class Game
     {
-        public void Roll(int pins)
+        private readonly List<IFrame> frames;
+
+        public Game()
         {
-            // Add your logic here. Add classes as needed.
+            frames = new List<IFrame>();
         }
 
-        public int GetScore()
+        public void Roll(int pins)
         {
-            // Returns the final score of the game.
-            return 0;
+            var frame = GetFrame();
+
+            frame.AddPins(pins);
         }
+
+        private IFrame GetFrame()
+        {
+            var frame = frames.LastOrDefault();
+
+            if (frame == null || frame.IsClosed())
+            {
+                frame =  FrameProvider.GetFrame(frames.Count + 1);
+                frames.Add(frame);
+            }
+
+            return frame;
+        }
+
+        public int GetScore() => frames.Sum(x => FrameScoreCalculatorProvider.GetFrameScoreCalculator(x).GetTotalScore(x, frames));
+
     }
 }
